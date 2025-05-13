@@ -1,0 +1,65 @@
+from PIL import Image
+import os
+
+def encrypt_image(image_path, key, output_path):
+    img = Image.open(image_path)
+    encrypted_img = Image.new(img.mode, img.size)
+    pixels = img.load()
+    encrypted_pixels = encrypted_img.load()
+
+    for x in range(img.width):
+        for y in range(img.height):
+            r, g, b = pixels[x, y]
+            # Encrypt each color channel
+            encrypted_pixels[x, y] = (
+                (r + key) % 256,
+                (g + key) % 256,
+                (b + key) % 256
+            )
+    encrypted_img.save(output_path)
+    print(f"Encrypted image saved as: {output_path}")
+
+def decrypt_image(image_path, key, output_path):
+    img = Image.open(image_path)
+    decrypted_img = Image.new(img.mode, img.size)
+    pixels = img.load()
+    decrypted_pixels = decrypted_img.load()
+
+    for x in range(img.width):
+        for y in range(img.height):
+            r, g, b = pixels[x, y]
+            # Decrypt each color channel
+            decrypted_pixels[x, y] = (
+                (r - key) % 256,
+                (g - key) % 256,
+                (b - key) % 256
+            )
+    decrypted_img.save(output_path)
+    print(f"Decrypted image saved as: {output_path}")
+
+def main():
+    print("Image Encryption/Decryption Tool")
+    choice = input("Do you want to (E)ncrypt or (D)ecrypt an image? ").strip().lower()
+    image_path = input("Enter the path to the image file: ").strip()
+
+    if not os.path.exists(image_path):
+        print("Image file does not exist.")
+        return
+
+    try:
+        key = int(input("Enter an integer key (e.g., 10): "))
+    except ValueError:
+        print("Invalid key. Must be an integer.")
+        return
+
+    if choice == 'e':
+        output_path = input("Enter the output path for encrypted image: ").strip()
+        encrypt_image(image_path, key, output_path)
+    elif choice == 'd':
+        output_path = input("Enter the output path for decrypted image: ").strip()
+        decrypt_image(image_path, key, output_path)
+    else:
+        print("Invalid choice. Use 'E' for encryption or 'D' for decryption.")
+
+if __name__ == "__main__":
+    main()
